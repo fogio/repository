@@ -11,16 +11,21 @@ class Post extends Repository
     protected function provideExtensions()
     {
         return [
-           (new DefaultOrder)->setOrder('post_id DESC'),
-           (new SerializeFields)->setFields(['post_attr']),
-           new Vcs(),
+            (new Fogio\Repository\Operation\OperationExtension())->setOperations(
+
+            ),
+
+            (new Fogio\Repository\Operation\DbTransaction()),
+
+            (new Fogio\Repository\Operation\EntityBase()),
+            (new Fogio\Repository\Operation\EntityMain())->setKey('post_id'),
+
+            (new Fogio\Repository\Operation\Table()),
+
+            
         ];
         
     }
 
-    protected function provideOperations()
-    {
-
-    }
 
 }
