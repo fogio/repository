@@ -4,8 +4,11 @@ namespace Fogio\Repository;
 
 use Fogio\Container\ContainerTrait;
 
-class Repository extends Container
+class Repository
 {
+    use ContainerTrait;
+    use ExtensionTrait;
+
     /**
      * @var RepositoryManager
      */
@@ -13,7 +16,7 @@ class Repository extends Container
 
     /* setup */
 
-    public function setRepositoryManager(RepositoryManager $manager)
+    public function setRepositoryManager(Container $manager)
     {
         $this->_manager = $manager;
 
@@ -22,7 +25,7 @@ class Repository extends Container
 
     public function getRepositoryManager()
     {
-        return $this->_db;
+        return $this->_manager;
     }
 
     public function setName($name)
@@ -37,55 +40,29 @@ class Repository extends Container
         return $this->_name;
     }
 
-    public function setExtensions($extensions)
-    {
-        // clean caches
-        unset(
-            $this->_extFetch, $this->_extFetchAll,
-            $this->_extSave, $this->_extRemove,
-            $this->_init // for onExtendInterface
-        );
-
-        $this->_ext = $extensions;
-        
-        return $this;
-    }
-
-    public function getExtensions()
-    {
-        return $this->_ext;
-    }
 
     /* provide */
 
-    protected function provideName() 
+    protected function provideName()
     {
         return lcfirst((new \ReflectionClass($this))->getShortName());
     }
 
-    protected function provideExtensions()
+    protected function provideKey()
     {
-        return [];
-    }
-    
-    /* read */
-    
-    public function fetch($query)
-    {
-        return (new Process($this->_extFetch, 'onFetch', [
-            'repository' => $this,
-            'query' => $query,
-            'result' => (object)['query' => $query, 'result' => null]
-        ]))->__invoke()->result;
+        return $this->_name . '_id';
     }
 
-    public function fetchAll($query)
+    /* read */
+    
+    public function fetch(array $query)
     {
-        return (new Process($this->_extFetchAll, 'onFetchAll', [
-            'repository' => $this,
-            'query' => $query,
-            'result' => (object)['query' => $query, 'result' => null]
-        ]))->__invoke()->result;
+        return $this->_process('Fetch', $query);
+    }
+
+    public function fetchAll(array $query)
+    {
+        return $this->_process('FetchAll', $query);
     }
 
     public function count($query)
@@ -97,12 +74,22 @@ class Repository extends Container
 
     public function save(array $entity)
     {
-        return (new Process($this->_extSave, 'onSave', ['repository' => $this, 'entity' => $entity]))->__invoke()->result;
+        return $this->_process('Save', $entity);
     }
 
     public function remove(array $entity)
     {
-        return (new Process($this->_extRemove, 'onRemove', ['repository' => $this, 'entity' => $entity]))->__invoke()->result;
+        return $this->_process('Remove', $entity);
+    }
+
+    protected function _process($id, $param)
+    {
+        return (new Process($this->{"_ext$id"}, "on$id", [
+            'id' => $id,
+            'repository' => $this,
+            'param'  => $param,
+            'result' => (object)['meta' => (object)['param' => $param], 'result' => null],
+        ]))->__invoke()->result;
     }
 
     /* lazy */
@@ -115,53 +102,6 @@ class Repository extends Container
     protected function __key()
     {
         return $this->setKey($this->provideKey())->getKey();
-    }
-
-    protected function __ext()
-    {
-        return $this->setExtensions($this->provideExtensions())->getExtensions();
-    }
-
-    protected function __extFetch()
-    {
-        return $this->_extIndex('Fetch', OnFetchInterface::class);
-    }
-
-    protected function __extFetchAll()
-    {
-        return $this->_extIndex('FetchAll', OnFetchAllInterface::class);
-    }
-
-    protected function __extSave()
-    {
-        return $this->_extIndex('Update', OnUpdateInterface::class);
-    }
-
-    protected function __extRemove()
-    {
-        return $this->_extIndex('Delete', OnDeleteInterface::class);
-    }
-
-    protected function _extIndex($operation, $interface)
-    {
-        $index = "_ext$operation"; 
-        $this->$index = [];
-        foreach ($this->_extension as $extension) {
-            if ($extension instanceof $interface) {
-                $this->$index[] = $extension;
-            }
-        }
-        $this->$index[] = $this;
-        return $this->$index;
-    }
-
-    protected function __init()
-    {
-        foreach ($this->_ext as $extension) {
-            if ($extension instanceof OnExtendInterface) {
-                $extension->onExtend($this);
-            }
-        }
     }
 
 }
