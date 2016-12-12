@@ -8,9 +8,7 @@ class Post extends Repository
         return [
             
             // cache
-            (new Fogio\Repository\Extension\Cache())
-                ->setSubjects([Fogio\Repository\Extension\Cache::FETCH_ALL])
-                ->setCache(fogio()->module->repository->cache),
+            (new Fogio\Repository\Extension\Cache()),
 
 
             // operations
