@@ -1,14 +1,13 @@
 <?php
 
-namespace Fogio\Repository\Extension;
+namespace Fogio\Repository\Table;
 
-use Fogio\Db\Table\Table;
 use Fogio\Repository\OnFetchAllInterface;
 use Fogio\Repository\OnFetchInterface;
 use Fogio\Repository\OnRemoveInterface;
 use Fogio\Repository\OnSaveInterface;
-use Fogio\Util\MiddlewareProcess as Process;
-use LogicException;
+use Fogio\Repository\Table\Table;
+
 
 class Table implements OnFetchInterface, OnFetchAllInterface, OnSaveInterface, OnRemoveInterface
 {

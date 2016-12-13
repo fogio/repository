@@ -1,6 +1,6 @@
 <?php
 
-namespace Fogio\Repository\Extension;
+namespace Fogio\Repository\Entity;
 
 use Fogio\Db\Table\Table;
 use Fogio\Repository\OnFetchAllInterface;
@@ -9,7 +9,7 @@ use Fogio\Repository\OnRemoveInterface;
 use Fogio\Repository\OnSaveInterface;
 use Fogio\Util\MiddlewareProcess as Process;
 
-class EntitySub implements OnFetchInterface, OnFetchAllInterface, OnSaveInterface, OnRemoveInterface
+class Sub implements OnFetchInterface, OnFetchAllInterface, OnSaveInterface, OnRemoveInterface
 {
 
     const FETCH_BY_JOIN   = 'FETCH_BY_JOIN';

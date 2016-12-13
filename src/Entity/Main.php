@@ -1,14 +1,14 @@
 <?php
 
+namespace Fogio\Repository\Entity;
+
 use Fogio\Repository\Extension\Table;
 use Fogio\Repository\OnFetchAllInterface;
 use Fogio\Repository\OnFetchInterface;
 use Fogio\Repository\OnRemoveInterface;
 use Fogio\Repository\OnSaveInterface;
 
-namespace Fogio\Repository\Extension;
-
-class EntityMain implements OnFetchInterface, OnFetchAllInterface, OnSaveInterface, OnRemoveInterface
+class Main implements OnFetchInterface, OnFetchAllInterface, OnSaveInterface, OnRemoveInterface
 {
 
     /* @var Table */

@@ -1,6 +1,6 @@
 <?php
 
-namespace Fogio\Repository\Extension;
+namespace Fogio\Repository\Entity;
 
 use Fogio\Db\Table\Table;
 use Fogio\Repository\OnFetchAllInterface;
@@ -10,7 +10,7 @@ use Fogio\Repository\OnSaveInterface;
 use Fogio\Util\MiddlewareProcess as Process;
 use LogicException;
 
-class EntityBase implements OnFetchInterface, OnFetchAllInterface, OnSaveInterface, OnRemoveInterface
+class Base implements OnFetchInterface, OnFetchAllInterface, OnSaveInterface, OnRemoveInterface
 {
 
     public function onFetch(Process $process)

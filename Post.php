@@ -10,30 +10,31 @@ class Post extends Repository
             // cache
             (new Fogio\Repository\Extension\Cache()),
 
-
-            // operations
-            (new Fogio\Repository\Extensions\EntityOperation())->setExtensions(
+            // a) operations on entity
+            (new Fogio\Repository\Entity\Operation())->setExtensions(
 
             ),
 
-            
+            // b) or table operatons
+            (new Fogio\Repository\Entity\Operation())->setExtensions(
+
+            ),
+
             // transaction
             (new Fogio\Repository\Extension\DbTransaction()),
 
 
             // subentities and other stuff
-            (new Fogio\Repository\Extension\EntitySub())->setTable(fogio()->db->location),
-            (new Fogio\Repository\Extension\EntityOriginBan()),
-            (new Fogio\Repository\Extension\Link()),
-
-
+            (new Fogio\Repository\Entity\Sub())->setTable(fogio()->db->location),
+            (new Fogio\Repository\Entity\OriginBan()),
+            (new Fogio\Repository\Entity\Link()),
 
             // a) as entity
-            (new Fogio\Repository\Extension\EntityBase()),
-            (new Fogio\Repository\Extension\EntityMain())->setTable(fogio()->db->post),
+            (new Fogio\Repository\Entity\Base()),
+            (new Fogio\Repository\Entity\Main())->setTable(fogio()->db->post),
 
             // b) or as simple table
-            (new Fogio\Repository\Extension\Table())->setTable(fogio()->db->post),
+            (new Fogio\Repository\Table\Table())->setTable(fogio()->db->post),
 
             
         ];

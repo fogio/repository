@@ -1,12 +1,11 @@
 <?php
 
-namespace Fogio\Repository\Operation;
+namespace Fogio\Repository\Entity;
 
-use Fogio\Repository\OnRemoveInterface;
 use Fogio\Repository\OnSaveInterface;
 use Fogio\Util\MiddlewareProcess;
 
-class EntityOperationPost implements OnSaveInterface
+class OperationPost implements OnSaveInterface
 {
 
     public function onSave(MiddlewareProcess $process)
