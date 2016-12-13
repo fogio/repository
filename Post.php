@@ -42,3 +42,35 @@ class Post extends Repository
 
 
 }
+/**
+ * Rel
+ *
+ * rel: id_master, id_slave, type, data, order, order_opposite
+ * rel: id_a, id_b, type, data, order, order_ba
+ *
+ * $entity = [
+ *  'entity_id' => '1234',
+ *  'rel:append' => ..
+ *  'rel:prepend' => ..
+ *  'rel:remove' => .. objects?
+ *  'rel' => [
+ *      '$type:add' => [
+ *          ['entity_id' => , 'data' => []]
+ *      ],
+ *      '$type:remove' => [],
+ *      ]
+ * ]
+ *
+ * article->fetchAll([
+ *  'rel' =>
+ *      master =
+ *      slave =
+ *      slave_and = $categires
+ *      master_and = [[123, 234], [345, 456]]
+ *
+ * ]);
+ *
+ * 
+ *
+ *
+ */
