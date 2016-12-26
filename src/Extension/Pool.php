@@ -2,19 +2,10 @@
 
 namespace Fogio\Repository\Extension;
 
-use Fogio\Repository\ExtensionTrait;
-use Fogio\Repository\OnFetchAllInterface;
-use Fogio\Repository\OnFetchInterface;
-use Fogio\Repository\OnRemoveInterface;
-use Fogio\Repository\OnSaveInterface;
-use Fogio\Repository\Operation\EntityOperationPost;
-use Fogio\Repository\Operation\EntityOperationPre;
-use Fogio\Util\MiddlewareProcess as Process;
+use Fogio\Middleware\Process;
 
-class Pool implements OnFetchInterface, OnFetchAllInterface, OnSaveInterface, OnRemoveInterface
+class Pool
 {
-    use ExtensionTrait;
-
     public function onFetch(Process $process)
     {
         $this->pool($process);

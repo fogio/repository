@@ -2,13 +2,12 @@
 
 namespace Fogio\Repository\Entity;
 
-use Fogio\Repository\OnSaveInterface;
-use Fogio\Util\MiddlewareProcess;
+use Fogio\Middleware\Process;
 
-class OperationPost implements OnSaveInterface
+class OperationPost
 {
 
-    public function onSave(MiddlewareProcess $process)
+    public function onSave(Process $process)
     {
         $process();
 

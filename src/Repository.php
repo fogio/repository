@@ -2,30 +2,32 @@
 
 namespace Fogio\Repository;
 
+use Fogio\Container\Container;
 use Fogio\Container\ContainerTrait;
+use Fogio\Middleware\MiddlewareTrait;
 
 class Repository
 {
     use ContainerTrait;
-    use ExtensionTrait;
+    use MiddlewareTrait { setActivities as protected; process as protected; }
 
     /**
      * @var RepositoryManager
      */
-    protected $_manager;
+    protected $_container;
 
     /* setup */
 
-    public function setRepositoryManager(Container $manager)
+    public function setRepositoryContainer(Container $container)
     {
-        $this->_manager = $manager;
+        $this->_container = $container;
 
         return $this;
     }
 
-    public function getRepositoryManager()
+    public function getRepositoryContainer()
     {
-        return $this->_manager;
+        return $this->_container;
     }
 
     public function setName($name)
@@ -40,6 +42,15 @@ class Repository
         return $this->_name;
     }
 
+    public function setExtensions(array $extensions)
+    {
+        return $this->setActivities($extensions);
+    }
+
+    public function getExtensions()
+    {
+        return $this->getActivities();
+    }
 
     /* provide */
 
@@ -48,48 +59,49 @@ class Repository
         return lcfirst((new \ReflectionClass($this))->getShortName());
     }
 
-    protected function provideKey()
+    protected function provideExtensions()
     {
-        return $this->_name . '_id';
+        return [];
     }
 
     /* read */
     
     public function fetch(array $query)
     {
-        return $this->_process('Fetch', $query);
+        return $this->process('onFetch', [
+            'repository' => $this,
+            'query' => $param,
+            'result' => (object)['meta' => (object)['query' => $query], 'result' => null],
+        ])->result;
     }
 
     public function fetchAll(array $query)
     {
-        return $this->_process('FetchAll', $query);
-    }
-
-    public function count($query)
-    {
-        return $this->fetchAll($query)->meta->all;
+        return $this->process('onFetchAll', [
+            'repository' => $this,
+            'query' => $param,
+            'result' => (object)['meta' => (object)['query' => $query], 'result' => null],
+        ])->result;
     }
 
     /* write */
 
     public function save(array $entity)
     {
-        return $this->_process('Save', $entity);
+        return $this->process('onSave', [
+            'repository' => $this,
+            'entity' => $entity,
+            'result' => (object)['meta' => (object)['entity' => $entity], 'result' => null],
+        ])->result;
     }
 
     public function remove(array $entity)
     {
-        return $this->_process('Remove', $entity);
-    }
-
-    protected function _process($id, $param)
-    {
-        return (new Process($this->{"_ext$id"}, "on$id", [
-            'id' => $id,
+        return $this->process('onRemove', [
             'repository' => $this,
-            'param'  => $param,
-            'result' => (object)['meta' => (object)['param' => $param], 'result' => null],
-        ]))->__invoke()->result;
+            'entity' => $entity,
+            'result' => (object)['meta' => (object)['entity' => $entity], 'result' => null],
+        ])->result;
     }
 
     /* lazy */
@@ -99,9 +111,11 @@ class Repository
         return $this->setName($this->provideName())->getName();
     }
 
-    protected function __key()
+    protected function __init()
     {
-        return $this->setKey($this->provideKey())->getKey();
+        foreach ($this->getActivitiesWithMethod('onExtend') as $extension) {
+            $extension->onExtend($this);
+        }
     }
 
 }
