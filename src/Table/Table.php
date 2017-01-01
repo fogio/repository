@@ -2,20 +2,16 @@
 
 namespace Fogio\Repository\Table;
 
-use Fogio\Repository\OnFetchAllInterface;
-use Fogio\Repository\OnFetchInterface;
-use Fogio\Repository\OnRemoveInterface;
-use Fogio\Repository\OnSaveInterface;
-use Fogio\Repository\Table\Table;
+use Fogio\Middleware\Process;
+use Fogio\Db\Table\Table as DbTable;
 
-
-class Table implements OnFetchInterface, OnFetchAllInterface, OnSaveInterface, OnRemoveInterface
+class Table
 {
 
     /* @var Table */
     protected $table;
 
-    public function setTable(Table $table)
+    public function setTable(DbTable $table)
     {
         $this->table = $table;
 
@@ -44,7 +40,7 @@ class Table implements OnFetchInterface, OnFetchAllInterface, OnSaveInterface, O
 
     public function onSave(Process $process)
     {
-        /* @var $table Table */
+        /* @var $table DbTable */
         $table = $this->getTable($process);
         $key   = $table->getKey();
 
@@ -58,15 +54,15 @@ class Table implements OnFetchInterface, OnFetchAllInterface, OnSaveInterface, O
             }
             $process->record->id = $table->fetchVal([':select' => $key, $key => $process->param[$key]]);
             if (!$process->record->id) {
-                $process->result->error = 'Entity with entity_id = `' . ((string)$process->param[$key]) . '` not found';
+                $process->result->error = 'Record with ' . $key. ' = `' . ((string)$process->param[$key]) . '` not found';
                 $process->result->result = false;
                 return;
             }
         }
 
-        $process->record->new = $process->result->new = !$process->entity->id;
+        $process->record->new = $process->result->new = !$process->record->id;
 
-        // create entity record
+        // create record
         $record = [];
         foreach ($table->getFields() as $field) {
             if (array_key_exists($field, $process->param) && $field != $key) {
@@ -92,7 +88,7 @@ class Table implements OnFetchInterface, OnFetchAllInterface, OnSaveInterface, O
         $table = $this->getTable($process);
         $key   = $table->getKey();
 
-        if (array_key_exists($key, $process->param)) { // by entity_id
+        if (array_key_exists($key, $process->param)) { // by $key
             if (!ctype_digit($process->param[$key])) {
                 throw new LogicException();
             }
@@ -101,7 +97,7 @@ class Table implements OnFetchInterface, OnFetchAllInterface, OnSaveInterface, O
             throw new LogicException("Expected `$key` param");
         }
 
-        $table->delete(['$key' => $process->record->id]);
+        $table->delete([$key => $process->record->id]);
 
         $process();
     }
@@ -110,7 +106,7 @@ class Table implements OnFetchInterface, OnFetchAllInterface, OnSaveInterface, O
     {
         $table = $this->getTable($process);
 
-        $proces->param[':join'][] = "JOIN `{$table->getName()}` ON (`{$table->getKey()}` = `entity_id`)";
+        $proces->param[':from'][] = $table->getName();
         $proces->param[':select'] = array_merge((array)$process->param[':select'], $table->getFields());
 
         $process();

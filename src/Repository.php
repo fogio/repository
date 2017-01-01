@@ -9,11 +9,8 @@ use Fogio\Middleware\MiddlewareTrait;
 class Repository
 {
     use ContainerTrait;
-    use MiddlewareTrait { setActivities as protected; process as protected; }
+    use MiddlewareTrait;
 
-    /**
-     * @var RepositoryManager
-     */
     protected $_container;
 
     /* setup */
@@ -42,26 +39,11 @@ class Repository
         return $this->_name;
     }
 
-    public function setExtensions(array $extensions)
-    {
-        return $this->setActivities($extensions);
-    }
-
-    public function getExtensions()
-    {
-        return $this->getActivities();
-    }
-
     /* provide */
 
     protected function provideName()
     {
         return lcfirst((new \ReflectionClass($this))->getShortName());
-    }
-
-    protected function provideExtensions()
-    {
-        return [];
     }
 
     /* read */
@@ -113,8 +95,8 @@ class Repository
 
     protected function __init()
     {
-        foreach ($this->getActivitiesWithMethod('onExtend') as $extension) {
-            $extension->onExtend($this);
+        foreach ($this->getActivitiesWithMethod('onExtend') as $activity) {
+            $activity->onExtend($this);
         }
     }
 

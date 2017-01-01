@@ -3,24 +3,20 @@
 namespace Fogio\Repository\Entity;
 
 use Fogio\Db\Table\Table;
-use Fogio\Repository\OnFetchAllInterface;
-use Fogio\Repository\OnFetchInterface;
-use Fogio\Repository\OnRemoveInterface;
-use Fogio\Repository\OnSaveInterface;
-use Fogio\Util\MiddlewareProcess as Process;
+use Fogio\Middleware\Process;
 use LogicException;
 
-class Base implements OnFetchInterface, OnFetchAllInterface, OnSaveInterface, OnRemoveInterface
+class Base
 {
 
     public function onFetch(Process $process)
     {
-        $this->fetch($process, 'fetch');
+        $this->fetch($process);
     }
 
     public function onFetchAll(Process $process)
     {
-        $this->fetch($process, 'fetchAll');
+        $this->fetch($process);
     }
 
     public function onSave(Process $process)
@@ -111,7 +107,7 @@ class Base implements OnFetchInterface, OnFetchAllInterface, OnSaveInterface, On
 
         $process();
 
-        $process->result->result = $table->$method($process->param);
+        $process->result->result = $table->{$process->getMethod()}($process->param);
     }
 
 }

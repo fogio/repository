@@ -12,8 +12,8 @@ use Fogio\Util\MiddlewareProcess as Process;
 class Sub implements OnFetchInterface, OnFetchAllInterface, OnSaveInterface, OnRemoveInterface
 {
 
-    const FETCH_BY_JOIN   = 'FETCH_BY_JOIN';
-    const FETCH_BY_ATTACH = 'FETCH_BY_ATTACH';
+    const FETCH_STRATEGY_BY_JOIN   = 'join';
+    const FETCH_STRATEGY_BY_ATTACH = 'attach';
 
     // fetch default
     // fetchAll default 
